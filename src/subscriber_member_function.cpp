@@ -23,7 +23,7 @@ class MinimalSubscriber : public rclcpp::Node
 {
 public:
   MinimalSubscriber()
-  : Node("minicernbo2_server")
+  : Node("minicernbot2_server")
   {
     subscription_ = this->create_subscription<geometry_msgs::msg::Twist>(
       "cmd_vel", 10, std::bind(&MinimalSubscriber::topic_callback, this, _1));
@@ -32,7 +32,13 @@ public:
 private:
   void topic_callback(const geometry_msgs::msg::Twist::SharedPtr msg) const
   {
-    RCLCPP_INFO(this->get_logger(), "I heard: '%f'", msg->linear.x);
+    RCLCPP_INFO(this->get_logger(), "I heard:");
+    RCLCPP_INFO(this->get_logger(), "     vx: '%f'", msg->linear.x);
+    RCLCPP_INFO(this->get_logger(), "     vy: '%f'", msg->linear.y);
+    RCLCPP_INFO(this->get_logger(), "     vz: '%f'", msg->linear.z);
+    RCLCPP_INFO(this->get_logger(), "     wx: '%f'", msg->angular.x);
+    RCLCPP_INFO(this->get_logger(), "     wy: '%f'", msg->angular.y);
+    RCLCPP_INFO(this->get_logger(), "     wz: '%f'", msg->angular.z);
   }
   rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr subscription_;
 };
