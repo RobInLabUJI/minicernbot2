@@ -23,7 +23,7 @@ class MinimalSubscriber : public rclcpp::Node
 {
 public:
   MinimalSubscriber()
-  : Node("minimal_subscriber")
+  : Node("minicernbo2_server")
   {
     subscription_ = this->create_subscription<geometry_msgs::msg::Twist>(
       "cmd_vel", 10, std::bind(&MinimalSubscriber::topic_callback, this, _1));
