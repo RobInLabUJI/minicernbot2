@@ -31,6 +31,7 @@ const char *uart_target = "/dev/ttyACM0";
 // SETUP SERIAL WORLD
 int fid = -1;
 struct termios  port_options;   // Create the structure
+unsigned char tx_buffer[NSERIAL_CHAR];
 
 void openSerialPort(){
     tcgetattr(fid, &port_options);      // Get the current attributes of the Serial port
@@ -115,30 +116,10 @@ void openSerialPort(){
 }
 
 void sendStringToSerialPort(unsigned char* tx_buffer){
-    std::cout << "Length: " << std::strlen(reinterpret_cast<const char *>(tx_buffer)) << std::endl;    //unsigned char *p_tx_buffer;
+    // std::cout << "Length: " << std::strlen(reinterpret_cast<const char *>(tx_buffer)) << std::endl;    //unsigned char *p_tx_buffer;
     int length = std::strlen(reinterpret_cast<const char *>(tx_buffer));
-    //p_tx_buffer = &tx_buffer[0];
 
-    //={"LINVELX":0.20, "LINVELY": 0.20, "ANGVELZ":0.20}
-    /*
-    *p_tx_buffer++ = 'w';
-    *p_tx_buffer++ = '\n';
-    *p_tx_buffer++ = 'a';
-    *p_tx_buffer++ = '\n';
-    *p_tx_buffer++ = 's';
-    *p_tx_buffer++ = '\n';
-    *p_tx_buffer++ = 'd';
-    *p_tx_buffer++ = '\n';
-    *p_tx_buffer++ = 'q';
-    *p_tx_buffer++ = '\n';
-    *p_tx_buffer++ = 'e';
-    *p_tx_buffer++ = '\n';
-    *p_tx_buffer++ = 'a';
-    *p_tx_buffer++ = 's';
-    *p_tx_buffer++ = 'd';
-     * */
-
-    printf("fid 1=%d\n", fid );
+    // printf("fid 1=%d\n", fid );
 
     if (fid != -1)
     {
@@ -148,7 +129,7 @@ void sendStringToSerialPort(unsigned char* tx_buffer){
 
         // usleep(1000);   // .001 sec delay
 
-        printf("Count = %d\n", count);
+        // printf("Count = %d\n", count);
 
         if (count < 0)  printf("UART TX error\n");
     }
@@ -190,13 +171,11 @@ public:
 private:
   void topic_callback(const geometry_msgs::msg::Twist::SharedPtr msg) const
   {
-    RCLCPP_INFO(this->get_logger(), "I heard:");
-    RCLCPP_INFO(this->get_logger(), "     vx: '%f'", msg->linear.x);
-    RCLCPP_INFO(this->get_logger(), "     vy: '%f'", msg->linear.y);
-    RCLCPP_INFO(this->get_logger(), "     vz: '%f'", msg->linear.z);
-    RCLCPP_INFO(this->get_logger(), "     wx: '%f'", msg->angular.x);
-    RCLCPP_INFO(this->get_logger(), "     wy: '%f'", msg->angular.y);
-    RCLCPP_INFO(this->get_logger(), "     wz: '%f'", msg->angular.z);
+    float x=msg->linear.x, y=msg->linear.y, z=msg->angular.z;
+    std::string commandToSerial = "={\"LINVELX\":"+ std::to_string(x)+", \"LINVELY\":"+std::to_string(y)+", \"ANGVELZ\":"+std::to_string(z)+"}\n";
+    // std::cout << commandToSerial;
+    strcpy(reinterpret_cast<char *>(tx_buffer), commandToSerial.c_str());
+    sendStringToSerialPort(tx_buffer);
   }
   rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr subscription_;
 };
