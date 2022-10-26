@@ -21,7 +21,7 @@ Run the server
 source /opt/ros/foxy/setup.bash
 cd ~/ros2_ws
 . install/setup.bash
-ros2 run minicernbot2 listener
+ros2 run minicernbot2 listener --ros-args -p uart_target:=/dev/ACM0
 ```
 
 Send motion commands with the keyboard

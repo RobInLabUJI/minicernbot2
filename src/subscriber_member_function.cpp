@@ -23,7 +23,9 @@
 #include <sys/fcntl.h>    // Used for UART
 #include <termios.h>      // Used for UART
 
-const char *uart_target = "/dev/ttyACM0";
+//const char *uart_target = "/dev/ttyACM0";
+std::string uart_target;
+
 #define     NSERIAL_CHAR   256
 #define     VMINX          1
 #define     BAUDRATE       115200
@@ -51,7 +53,7 @@ void openSerialPort(){
     //                 Caution: VMIN and VTIME flags are ignored if O_NONBLOCK flag is set.
     //      O_NOCTTY - When set and path identifies a terminal device, open() shall not cause the terminal device to become the controlling terminal for the process.fid = open("/dev/ttyTHS1", O_RDWR | O_NOCTTY | O_NDELAY);          //Open in non blocking read/write mode
 
-    fid = open(uart_target, O_RDWR | O_NOCTTY );
+    fid = open(uart_target.c_str(), O_RDWR | O_NOCTTY );
 
     tcflush(fid, TCIFLUSH);
     tcflush(fid, TCIOFLUSH);
@@ -158,7 +160,10 @@ public:
   MinimalSubscriber()
   : Node("minicernbot2_server")
   {
-    std::cout << "test_serial_port" << std::endl;
+    this->declare_parameter("uart_target");
+    uart_target = this->get_parameter("uart_target").get_parameter_value().get<std::string>();
+    
+    std::cout << "test_serial_port: " << uart_target <<  std::endl;
     openSerialPort();
 
     unsigned char tx_buffer[NSERIAL_CHAR] = "={\"LINVELX\":0.01, \"LINVELY\": 0.01, \"ANGVELZ\":0.0}\n";
